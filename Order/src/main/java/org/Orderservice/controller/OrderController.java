@@ -1,12 +1,14 @@
 package org.Orderservice.controller;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.Orderservice.dto.OrderDto;
 import org.Orderservice.dto.RequestOrder;
 import org.Orderservice.dto.ResponseOrder;
 import org.Orderservice.service.KafkaProducer;
+import org.Orderservice.service.OrderProducer;
 import org.Orderservice.service.OrderService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -24,6 +26,7 @@ public class OrderController {
 
     private final OrderService orderService;
     private final KafkaProducer kafkaProducer;
+    private final OrderProducer orderProducer;
 
 
     @PostMapping(value = "/{userId}/orders")
@@ -35,12 +38,21 @@ public class OrderController {
 
         OrderDto orderDto = modelMapper.map(orderDetails, OrderDto.class);
         orderDto.setUserId(userId);
+        /*jpa
         OrderDto createDto = orderService.createOrder(orderDto);
 
         ResponseOrder returnValue = modelMapper.map(createDto,ResponseOrder.class);
+        */
+
+        /*kafka*/
+        orderDto.setOrderId(UUID.randomUUID().toString());
+        orderDto.setTotalPrice(orderDetails.getQty()*orderDetails.getUnitPrice());
+        ResponseOrder returnValue = modelMapper.map(orderDto,ResponseOrder.class);
+
+
 
         kafkaProducer.send("example-order-topic",orderDto);
-
+        orderProducer.send("orders",orderDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
 
