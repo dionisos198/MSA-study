@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.Orderservice.dto.OrderDto;
 import org.Orderservice.dto.RequestOrder;
 import org.Orderservice.dto.ResponseOrder;
+import org.Orderservice.service.KafkaProducer;
 import org.Orderservice.service.OrderService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final OrderService orderService;
+    private final KafkaProducer kafkaProducer;
+
 
     @PostMapping(value = "/{userId}/orders")
     public ResponseEntity<ResponseOrder> createOrder(@PathVariable("userId") String userId,
@@ -35,6 +38,9 @@ public class OrderController {
         OrderDto createDto = orderService.createOrder(orderDto);
 
         ResponseOrder returnValue = modelMapper.map(createDto,ResponseOrder.class);
+
+        kafkaProducer.send("example-order-topic",orderDto);
+
 
         return ResponseEntity.status(HttpStatus.CREATED).body(returnValue);
 
