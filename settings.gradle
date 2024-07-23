@@ -1,0 +1,9 @@
+rootProject.name = 'msa'
+include 'ecoomerce'
+include 'UserService'
+include 'apigate-service'
+include 'first-service'
+include 'second-service'
+include 'Catalog'
+include 'Order'
+
