@@ -1,5 +1,7 @@
 package org.example.controller;
 
+import io.micrometer.core.annotation.Timed;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
@@ -35,10 +37,12 @@ public class UserController {
     private final UserRepository userRepository;
 
     @GetMapping("/health_check")
-    public String status(){
-        return "it's working in User Service";
+    @Timed(value = "users.status", longTask = true)
+    public String status(HttpServletRequest request){
+        return String.format("It's working in User Service");
     }
 
+    @Timed(value = "users.welcome",longTask = true)
     @GetMapping("/welcome")
     public String welcome(){
         return environment.getProperty("greeting.message");
