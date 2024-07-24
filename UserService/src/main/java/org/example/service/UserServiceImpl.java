@@ -18,6 +18,8 @@ import org.example.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.spi.MatchingStrategy;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.client.circuitbreaker.CircuitBreakerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
@@ -47,6 +49,7 @@ public class UserServiceImpl implements UserService{
     private final RestTemplate restTemplate;
     private final Environment env;
     private final OrderServiceClient orderServiceClient;
+    private final CircuitBreakerFactory circuitBreakerFactory;
     @Override
     public UserDto createUser(UserDto userDto) {
         userDto.setUserId(UUID.randomUUID().toString());
@@ -109,7 +112,14 @@ public class UserServiceImpl implements UserService{
 
         List<ResponseOrder> ordersList = orderListResponse.getBody();
 */
-        List<ResponseOrder> ordersList = orderServiceClient.getOrders(userId,"Bearer "+accessToken);
+
+
+        //Order Servcie 에서 에러나는 경우 500 error 발생
+        //List<ResponseOrder> ordersList = orderServiceClient.getOrders(userId,"Bearer "+accessToken);
+
+        CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
+        List<ResponseOrder> ordersList = circuitBreaker.run(()->orderServiceClient.getOrders(userId,accessToken),
+                throwable -> new ArrayList<>());
 
 
         userDto.setOrders(ordersList);

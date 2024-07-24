@@ -40,6 +40,10 @@ dependencies {
     //openfiegn
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.3'
 
+    //resilence4j
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
+
+
 }
 
 dependencyManagement {
