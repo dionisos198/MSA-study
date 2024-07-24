@@ -13,6 +13,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.9'
     implementation 'org.springframework.kafka:spring-kafka'
+
+    //zipkins & actuator
+    //zipkin & actoator
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
 }
 
 dependencyManagement {

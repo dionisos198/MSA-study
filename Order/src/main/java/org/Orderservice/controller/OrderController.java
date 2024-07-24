@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.Orderservice.dto.OrderDto;
 import org.Orderservice.dto.RequestOrder;
 import org.Orderservice.dto.ResponseOrder;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class OrderController {
 
     private final OrderService orderService;
@@ -61,10 +63,18 @@ public class OrderController {
     @GetMapping("/{userId}/orders")
     public ResponseEntity<List<ResponseOrder>> getOrder(@PathVariable("userId") String userId){
 
+        log.info("Before retrieve orders data");
+
         System.out.println("hi");
 
-        return ResponseEntity.ok(orderService.getOrdersByUserId(userId).stream().map(orderEntity -> new ModelMapper().map(orderEntity,ResponseOrder.class)).collect(
-                Collectors.toList()));
+        List<ResponseOrder> collect = orderService.getOrdersByUserId(userId).stream()
+                .map(orderEntity -> new ModelMapper().map(orderEntity, ResponseOrder.class))
+                .collect(
+                        Collectors.toList());
+
+        log.info("Add retrieved orders data");
+
+        return ResponseEntity.ok(collect);
 
 
     }

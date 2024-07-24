@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.math.raw.Mod;
 import org.example.config.TokenProvider;
 import org.example.dto.RequestLogin;
@@ -40,6 +41,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
@@ -117,10 +119,12 @@ public class UserServiceImpl implements UserService{
         //Order Servcie 에서 에러나는 경우 500 error 발생
         //List<ResponseOrder> ordersList = orderServiceClient.getOrders(userId,"Bearer "+accessToken);
 
+        log.info("Before call orders microservices");
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create("circuitbreaker");
         List<ResponseOrder> ordersList = circuitBreaker.run(()->orderServiceClient.getOrders(userId,accessToken),
                 throwable -> new ArrayList<>());
 
+        log.info("after callec orders microservice");
 
         userDto.setOrders(ordersList);
 
